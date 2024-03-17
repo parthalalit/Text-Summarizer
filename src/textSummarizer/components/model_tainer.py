@@ -4,6 +4,7 @@ from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 from textSummarizer.entity import ModelTrainerConfig
 from datasets import load_dataset, load_from_disk
 import torch
+import os
 
 
 class ModelTrainer:
@@ -42,7 +43,7 @@ class ModelTrainer:
                     tokenizer=tokenizer, data_collator=seq2seq_data_collator,
                     train_dataset=dataset_samsum_pt["train"], 
                     eval_dataset=dataset_samsum_pt["validation"])
-        
+
         trainer.train()
 
         ## Save model
