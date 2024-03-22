@@ -1,5 +1,6 @@
 import streamlit as st
 from textSummarizer.pipeline.prediction import PredictionPipeline
+import os
 
 def main():
     st.title("Text Summarization App")
