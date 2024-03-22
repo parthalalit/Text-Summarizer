@@ -1,36 +1,40 @@
 import streamlit as st
 from textSummarizer.pipeline.prediction import PredictionPipeline
-import os
+import subprocess
 
+text = "What is Text Summarization?"
+
+# Initialize the prediction pipeline object
+prediction_pipeline = PredictionPipeline()
+
+# Define the Streamlit app
 def main():
-    st.title("Text Summarization App")
+    st.title('Text Summarization App')
 
-    st.sidebar.title("Navigation")
-    app_mode = st.sidebar.radio("Go to", ["Home", "Train", "Predict"])
+    # Redirect to documentation
+    if st.button('Go to Documentation'):
+        st.experimental_set_query_params()
+        st.experimental_rerun()
 
-    if app_mode == "Home":
-        st.write("Welcome to the Text Summarization App!")
-        st.write("You can train the model or use it to make predictions.")
-
-    elif app_mode == "Train":
-        st.write("Training...")
+    # Train the model
+    if st.button('Train Model'):
         try:
-            os.system("python main.py")
-            st.success("Training successful!")
+            subprocess.run(["python", "main.py"])
+            st.write("Training successful!")
         except Exception as e:
-            st.error(f"Error occurred! {e}")
+            st.error(f"Error occurred during training: {e}")
 
-    elif app_mode == "Predict":
-        st.subheader("Text Input")
-        text = st.text_area("Enter the text you want to summarize:")
-        if st.button("Summarize"):
-            try:
-                obj = PredictionPipeline()
-                summary = obj.predict(text)
-                st.subheader("Summary")
-                st.write(summary)
-            except Exception as e:
-                st.error(f"An error occurred during prediction: {e}")
+    # Input text for prediction
+    input_text = st.text_input('Enter text for prediction', text)
 
-if __name__ == "__main__":
+    # Predict
+    if st.button('Predict'):
+        try:
+            summary = prediction_pipeline.predict(input_text)
+            st.subheader('Summary')
+            st.write(summary)
+        except Exception as e:
+            st.error(f"Error occurred during prediction: {e}")
+
+if __name__ == '__main__':
     main()
