@@ -1,39 +1,45 @@
-import streamlit as st
-from textSummarizer.pipeline.prediction import PredictionPipeline
+from fastapi import FastAPI
+import uvicorn
+import sys
 import os
+from fastapi.templating import Jinja2Templates
+from starlette.responses import RedirectResponse
+from fastapi.responses import Response
+from textSummarizer.pipeline.prediction import PredictionPipeline
 
-text = "What is Text Summarization?"
 
-# Initialize the prediction pipeline object
-prediction_pipeline = PredictionPipeline()
+text:str = "What is Text Summarization?"
 
-# Define the Streamlit app
-def main():
-    st.title('Text Summarization App')
+app = FastAPI()
 
-    # Redirect to documentation
-    if st.button('Go to Documentation'):
-        st.markdown('[Link to Documentation](https://docs.streamlit.io/)')
+@app.get("/", tags=["authentication"])
+async def index():
+    return RedirectResponse(url="/docs")
 
-    # Train the model
-    if st.button('Train Model'):
-        try:
-            os.system("python main.py")
-            st.write("Training successful!")
-        except Exception as e:
-            st.error(f"Error occurred during training: {e}")
 
-    # Input text for prediction
-    input_text = st.text_input('Enter text for prediction', text)
 
-    # Predict
-    if st.button('Predict'):
-        try:
-            summary = prediction_pipeline.predict(input_text)
-            st.subheader('Summary')
-            st.write(summary)
-        except Exception as e:
-            st.error(f"Error occurred during prediction: {e}")
+@app.get("/train")
+async def training():
+    try:
+        os.system("python main.py")
+        return Response("Training successful !!")
 
-if __name__ == '__main__':
-    main()
+    except Exception as e:
+        return Response(f"Error Occurred! {e}")
+    
+
+
+
+@app.post("/predict")
+async def predict_route(text):
+    try:
+
+        obj = PredictionPipeline()
+        text = obj.predict(text)
+        return text
+    except Exception as e:
+        raise e
+    
+
+if __name__=="__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8080)
