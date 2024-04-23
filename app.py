@@ -1,6 +1,6 @@
 import streamlit as st
 from textSummarizer.pipeline.prediction import PredictionPipeline
-import subprocess
+import os
 
 text = "What is Text Summarization?"
 
@@ -13,13 +13,12 @@ def main():
 
     # Redirect to documentation
     if st.button('Go to Documentation'):
-        st.experimental_set_query_params()
-        st.experimental_rerun()
+        st.markdown('[Link to Documentation](https://docs.streamlit.io/)')
 
     # Train the model
     if st.button('Train Model'):
         try:
-            subprocess.run(["python", "main.py"])
+            os.system("python main.py")
             st.write("Training successful!")
         except Exception as e:
             st.error(f"Error occurred during training: {e}")
