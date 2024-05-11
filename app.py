@@ -1,5 +1,5 @@
 import streamlit as st
-from textSummarizer.pipeline.prediction import PredictionPipeline
+from src.textSummarizer.pipeline.prediction import PredictionPipeline
 import os
 
 text = "What is Text Summarization?"
