@@ -1,45 +1,39 @@
-from fastapi import FastAPI
-import uvicorn
-import sys
-import os
-from fastapi.templating import Jinja2Templates
-from starlette.responses import RedirectResponse
-from fastapi.responses import Response
+import streamlit as st
 from textSummarizer.pipeline.prediction import PredictionPipeline
+import os
 
+text = "What is Text Summarization?"
 
-text:str = "What is Text Summarization?"
+# Initialize the prediction pipeline object
+prediction_pipeline = PredictionPipeline()
 
-app = FastAPI()
+# Define the Streamlit app
+def main():
+    st.title('Text Summarization App')
 
-@app.get("/", tags=["authentication"])
-async def index():
-    return RedirectResponse(url="/docs")
+    # Redirect to documentation
+    if st.button('Go to Documentation'):
+        st.markdown('[Link to Documentation](https://docs.streamlit.io/)')
 
+    # Train the model
+    if st.button('Train Model'):
+        try:
+            os.system("python main.py")
+            st.write("Training successful!")
+        except Exception as e:
+            st.error(f"Error occurred during training: {e}")
 
+    # Input text for prediction
+    input_text = st.text_input('Enter text for prediction', text)
 
-@app.get("/train")
-async def training():
-    try:
-        os.system("python main.py")
-        return Response("Training successful !!")
+    # Predict
+    if st.button('Predict'):
+        try:
+            summary = prediction_pipeline.predict(input_text)
+            st.subheader('Summary')
+            st.write(summary)
+        except Exception as e:
+            st.error(f"Error occurred during prediction: {e}")
 
-    except Exception as e:
-        return Response(f"Error Occurred! {e}")
-    
-
-
-
-@app.post("/predict")
-async def predict_route(text):
-    try:
-
-        obj = PredictionPipeline()
-        text = obj.predict(text)
-        return text
-    except Exception as e:
-        raise e
-    
-
-if __name__=="__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8080)
+if __name__ == '__main__':
+    main()
